@@ -16,6 +16,7 @@
       git clean -f
       git stash
   ignore_errors: true
+  changed_when: false
   args:
     chdir: "{{ glusterfs_dev_dir }}"
 
@@ -29,9 +30,14 @@
     version: "v{{ glusterfs_git_version }}"
 
 - name: Retrieve the installed GlusterFS version
-  command: gluster --version | head -1 | grep -oP "[0-9].[0-9]"
+  shell: >-
+    gluster --version | head -1 | grep -oP "[0-9].[0-9]"
+  args:
+    executable: /bin/bash
   register: glusterfs_version_check
-  changed_when: glusterfs_version_check.stdout.find(glusterfs_git_version) == -1
+  check_mode: no
+  changed_when: >-
+    not (glusterfs_version_check.stdout | regex_search(glusterfs_git_version | string))
   ignore_errors: true
 
 - name: Build from source
