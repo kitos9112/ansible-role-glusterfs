@@ -8,10 +8,22 @@
 
 # Setup/install tasks.
 - include: setup-RedHat.yml
-  when: ansible_os_family == 'RedHat'
+  when: 
+    - ansible_os_family == 'RedHat'
+    - not glusterfs_compile |bool
 
 - include: setup-{{ ansible_distribution }}.yml
-  when: ansible_os_family == 'Debian'
+  when: 
+    - ansible_os_family == 'Debian'
+    - not glusterfs_compile |bool
+
+- include: setup-from-source.yml
+  when:
+    - ansible_os_family == 'Debian'
+    - glusterfs_compile |bool
 
 - name: Ensure GlusterFS is started and enabled at boot.
-  service: "name={{ glusterfs_daemon }} state=started enabled=yes"
+  service: 
+    name: "{{ glusterfs_daemon }}"
+    state: started 
+    enabled: yes

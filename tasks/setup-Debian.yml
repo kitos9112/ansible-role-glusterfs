@@ -18,6 +18,11 @@
   changed_when: false
   register: deb_architecture
 
+- name: DEBUG
+  debug:
+    msg:  "deb [trusted=yes] https://download.gluster.org/pub/gluster/glusterfs/{{ glusterfs_deb_version }}/Debian/\
+      {{ ansible_distribution_release }}/{{ deb_architecture.stdout }}/apt {{ ansible_distribution_release }} \
+      main"
 - name: Ensure debian repo is present.
   apt_repository:
     repo: "deb [trusted=yes] https://download.gluster.org/pub/gluster/glusterfs/{{ glusterfs_deb_version }}/Debian/\

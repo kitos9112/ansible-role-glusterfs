@@ -9,3 +9,7 @@ glusterfs_ppa_version: "7"
 # For Debian.
 glusterfs_gpg_key_version: "7"
 glusterfs_deb_version: "LATEST"
+
+# For local compilation
+glusterfs_compile: false
+glusterfs_git_version: 8.1
