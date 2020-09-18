@@ -1,5 +1,6 @@
 ---
 glusterfs_daemon: glusterd
+glusterfs_daemon_events: glustereventsd
 
 # For Ubuntu.
 glusterfs_default_release: ""

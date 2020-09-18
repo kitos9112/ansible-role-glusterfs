@@ -1,0 +1,36 @@
+---
+# If there are local changes, git checkout etc doesn't work.
+# The directory may not exist in first run, which is not an error
+- name: Clean glusterfs source directory
+  shell: |
+    git clean -f
+    git stash
+  ignore_errors: true
+  changed_when: false
+  args:
+    chdir: "{{ glusterfs_dev_dir }}"
+
+# - name: Run configure to generate Makefile for building GlusterFS
+#   command: ./configure "{{ wolibtirpc | default('') }}"
+#   args:
+#     chdir: "{{ glusterfs_dev_dir }}"
+
+# - name: Uninstall glusterFS from source
+#   # if make clean is not done before
+#   make:
+#     chdir: "{{ glusterfs_dev_dir }}"
+#     target: uninstall
+
+- name: Remove services
+  shell: "systemctl stop {{ glusterfs_daemon }} {{ glusterfs_daemon_events }}; systemctl disable {{ glusterfs_daemon }} {{ glusterfs_daemon_events }}"
+
+- name: Delete leftovers I
+  changed_when: false
+  shell: "rm -rf /etc/systemd/system/{{ glusterfs_daemon }}"
+
+- name: Delete leftovers II
+  changed_when: false
+  shell: "rm -rf /etc/systemd/system/{{ glusterfs_daemon }}"
+
+- name: Reload daemon and reset failed services
+  shell: "systemctl daemon-reload; systemctl reset-failed"

@@ -5,25 +5,36 @@
   when:
     - ansible_distribution == 'Ubuntu'
     - ansible_distribution_version == "14.04"
+    - not glusterfs_uninstall |bool
 
 # Setup/install tasks.
 - include: setup-RedHat.yml
   when: 
     - ansible_os_family == 'RedHat'
     - not glusterfs_compile |bool
+    - not glusterfs_uninstall |bool
 
 - include: setup-{{ ansible_distribution }}.yml
   when: 
     - ansible_os_family == 'Debian'
     - not glusterfs_compile |bool
+    - not glusterfs_uninstall |bool
 
 - include: setup-from-source.yml
   when:
     - ansible_os_family == 'Debian'
     - glusterfs_compile |bool
+    - not glusterfs_uninstall |bool
 
 - name: Ensure GlusterFS is started and enabled at boot.
   service: 
     name: "{{ glusterfs_daemon }}"
     state: started 
     enabled: yes
+  when:
+    - not glusterfs_uninstall |bool
+
+# Uninstall tasks.
+- include: uninstall.yml
+  when: 
+    - glusterfs_uninstall |bool
