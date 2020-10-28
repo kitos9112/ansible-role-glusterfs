@@ -24,13 +24,13 @@
 - name: Remove services
   shell: "systemctl stop {{ glusterfs_daemon }} {{ glusterfs_daemon_events }}; systemctl disable {{ glusterfs_daemon }} {{ glusterfs_daemon_events }}"
 
-- name: Delete leftovers I
-  changed_when: false
-  shell: "rm -rf /etc/systemd/system/{{ glusterfs_daemon }}"
+# - name: Delete leftovers I
+#   changed_when: false
+#   shell: "rm -rf /etc/systemd/system/{{ glusterfs_daemon }}"
 
-- name: Delete leftovers II
-  changed_when: false
-  shell: "rm -rf /etc/systemd/system/{{ glusterfs_daemon }}"
+# - name: Delete leftovers II
+#   changed_when: false
+#   shell: "rm -rf /etc/systemd/system/{{ glusterfs_daemon }}"
 
 - name: Reload daemon and reset failed services
   shell: "systemctl daemon-reload; systemctl reset-failed"

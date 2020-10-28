@@ -1,6 +1,7 @@
 ---
 glusterfs_daemon: glusterd
 glusterfs_daemon_events: glustereventsd
+glusterfs_uninstall: false
 
 # For Ubuntu.
 glusterfs_default_release: ""
