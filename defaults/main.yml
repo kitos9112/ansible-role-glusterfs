@@ -14,4 +14,4 @@ glusterfs_deb_version: "LATEST"
 
 # For local compilation
 glusterfs_compile: false
-glusterfs_git_version: 8.1
+glusterfs_git_version: 8.2
