@@ -8,13 +8,14 @@
   file:
     path: "{{ glusterfs_dev_dir }}"
     state: directory
+    mode: 0755
 
 # If there are local changes, git checkout etc doesn't work.
 # The directory may not exist in first run, which is not an error
 - name: Clean glusterfs source directory
   shell: |
-      git clean -f
-      git stash
+    git clean -f
+    git stash
   ignore_errors: true
   changed_when: false
   args:
@@ -23,8 +24,8 @@
 - name: Git checkout glusterfs
   git:
     depth: 1
-    clone: yes
-    update: yes
+    clone: true
+    update: true
     repo: "{{ glusterfs_git_repo }}"
     dest: "{{ glusterfs_dev_dir }}"
     version: "v{{ glusterfs_git_version }}"
@@ -35,7 +36,7 @@
   args:
     executable: /bin/bash
   register: glusterfs_version_check
-  check_mode: no
+  check_mode: false
   changed_when: >-
     not (glusterfs_version_check.stdout | regex_search(glusterfs_git_version | string))
   ignore_errors: true
@@ -43,37 +44,37 @@
 - name: Build from source
   when: glusterfs_version_check.changed or glusterfs_version_check.failed
   block:
-  # Run autogen and configure to generate makefile
-  - name: Generate configure file
-    command: ./autogen.sh
-    args:
-      chdir: "{{ glusterfs_dev_dir }}"
+    # Run autogen and configure to generate makefile
+    - name: Generate configure file
+      command: ./autogen.sh
+      args:
+        chdir: "{{ glusterfs_dev_dir }}"
 
-  - name: Run configure to generate Makefile for building GlusterFS
-    command: ./configure "{{ wolibtirpc | default('') }}"
-    args:
-      chdir: "{{ glusterfs_dev_dir }}"
+    - name: Run configure to generate Makefile for building GlusterFS
+      command: ./configure "{{ wolibtirpc | default('') }}"
+      args:
+        chdir: "{{ glusterfs_dev_dir }}"
 
-  # There can be some generated .c files, which gives an warning of 'overwriting'
-  # if make clean is not done before
-  - name: Clean glusterfs source directory
-    make:
-      chdir: "{{ glusterfs_dev_dir }}"
-      target: clean
+    # There can be some generated .c files, which gives an warning of 'overwriting'
+    # if make clean is not done before
+    - name: Clean glusterfs source directory
+      make:
+        chdir: "{{ glusterfs_dev_dir }}"
+        target: clean
 
-  # Can't do make install in a single command with this module
-  - name: Build and install GlusterFS
-    make:
-      chdir: "{{ glusterfs_dev_dir }}"
-      target: install
+    # Can't do make install in a single command with this module
+    - name: Build and install GlusterFS
+      make:
+        chdir: "{{ glusterfs_dev_dir }}"
+        target: install
 
-  # Can't do make install in a single command with this module
-  - name: Clean build directory
-    make:
-      chdir: "{{ glusterfs_dev_dir }}"
-      target: distclean
+    # Can't do make install in a single command with this module
+    - name: Clean build directory
+      make:
+        chdir: "{{ glusterfs_dev_dir }}"
+        target: distclean
 
-  - name: Reload shared libraries upon successful build
-    command: /sbin/ldconfig -v
-    args:
-      chdir: "{{ glusterfs_dev_dir }}"
+    - name: Reload shared libraries upon successful build
+      command: /sbin/ldconfig -v
+      args:
+        chdir: "{{ glusterfs_dev_dir }}"
